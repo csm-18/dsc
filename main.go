@@ -93,7 +93,62 @@ func userPrompt(command string) {
 		}
 
 	} else if command == "delete" {
-		println("delete shortcut!")
+		var shortcutName string
+		var deleteShortcut string
+		var desktopShortcutPath string
+		var current_user string
+		fmt.Println("dsc", VERSION)
+		for {
+			fmt.Println("Enter name of the shortcut:")
+			fmt.Scanln(&shortcutName)
+			if shortcutName == "" {
+				fmt.Println("Enter all fields!")
+				continue
+			}
+
+			fmt.Println("Do you really want to delete the shortcut?(y/n)")
+			fmt.Scanln(&deleteShortcut)
+			if deleteShortcut == "" {
+				fmt.Println("Enter all fields!")
+				continue
+			}
+
+			if deleteShortcut == "y" || deleteShortcut == "Y" {
+
+				usr, error := user.Current()
+				if error != nil {
+					fmt.Println("Error while deleting shortcut!")
+					os.Exit(0)
+				} else {
+					current_user = usr.Username
+				}
+
+				desktopShortcutPath = "/home/" + current_user + "/Desktop/" + shortcutName + ".desktop"
+				_, err := os.Stat(desktopShortcutPath)
+				if os.IsNotExist(err) {
+					fmt.Println("\nNo shortcut exists with the specified name!")
+					fmt.Println("Enter correct name!")
+					os.Exit(0)
+				}
+
+				fmt.Println("\nFor safety reasons, only the 'desktop shortcut' is deleted,\n not the 'desktop entry' of the application.")
+				err = os.Remove(desktopShortcutPath)
+				if err != nil {
+					fmt.Println("Error while deleting shortcut!")
+					os.Exit(0)
+				} else {
+					fmt.Println("\nSuccessfully deleted shortcut:")
+					fmt.Println(" ", desktopShortcutPath)
+				}
+
+			} else if deleteShortcut == "n" || deleteShortcut == "N" {
+				os.Exit(0)
+			} else {
+				fmt.Println("Enter valid option!")
+				continue
+			}
+			break
+		}
 	}
 }
 
